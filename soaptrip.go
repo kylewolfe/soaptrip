@@ -1,3 +1,4 @@
+// soaptrip is an HTTP Transport wrapper for parsing SOAP Faults
 package soaptrip
 
 import (
