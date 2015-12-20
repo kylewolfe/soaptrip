@@ -62,14 +62,6 @@ func (sf SoapFault) Error() string {
 // of type SoapFault, otherwise it will return nil
 func ParseFault(resp *http.Response) error {
 	var buf bytes.Buffer
-
-	defer func() {
-		resp.Body = struct {
-			io.Reader
-			io.Closer
-		}{io.MultiReader(bytes.NewReader(buf.Bytes()), resp.Body), resp.Body}
-	}()
-
 	d := xml.NewDecoder(io.TeeReader(resp.Body, &buf))
 
 	var start xml.StartElement
@@ -107,6 +99,11 @@ func ParseFault(resp *http.Response) error {
 			}
 		}
 	}
+
+	resp.Body = struct {
+		io.Reader
+		io.Closer
+	}{io.MultiReader(bytes.NewReader(buf.Bytes()), resp.Body), resp.Body}
 
 	if found {
 		fault.Response = resp
